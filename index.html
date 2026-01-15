@@ -3,6 +3,10 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<meta property="og:title" content="年會工作人員點餐系統">
+<meta property="og:description" content="Mr.布魯 & 鮮自然">
+<meta property="og:type" content="website">
 <title>年會工作人員點餐系統</title>
 <style>
   /* --- 柔和風格配色變數 --- */
@@ -11,7 +15,7 @@
     --primary-dark: #52796f;
     --secondary: #669bbc; /* 柔和霧霾藍 (餐點) */
     --bg: #fdfbf7;        /* 溫暖的米白背景 */
-    --text: #555;         /* 深灰文字，不那麼刺眼 */
+    --text: #555;         /* 深灰文字 */
     --border: #e0e0e0;
     --shadow: 0 4px 20px rgba(0,0,0,0.05);
   }
@@ -22,7 +26,7 @@
     color: var(--text);
     margin: 0;
     padding: 20px;
-    padding-bottom: 100px; /* 底部留白給固定按鈕 */
+    padding-bottom: 100px;
   }
 
   .container {
@@ -30,7 +34,7 @@
     margin: 0 auto;
     background: white;
     padding: 30px;
-    border-radius: 20px; /* 大圓角 */
+    border-radius: 20px;
     box-shadow: var(--shadow);
     border: 1px solid #f0f0f0;
   }
@@ -51,7 +55,6 @@
     margin-bottom: 30px;
   }
 
-  /* 分隔標題樣式優化 */
   h2 {
     font-size: 1.1rem;
     color: #fff;
@@ -87,7 +90,6 @@
     font-size: 0.95rem;
   }
   
-  /* 輸入框與選單柔和化 */
   select, input[type="text"] {
     width: 100%;
     padding: 14px;
@@ -107,7 +109,6 @@
     box-shadow: 0 0 0 3px rgba(132, 169, 140, 0.2);
   }
 
-  /* 按鈕群組樣式 */
   .btn-group {
     display: flex;
     gap: 12px;
@@ -119,7 +120,7 @@
     min-width: 70px;
     padding: 12px;
     border: 1px solid var(--border);
-    border-radius: 50px; /* 膠囊狀 */
+    border-radius: 50px;
     background: white;
     text-align: center;
     cursor: pointer;
@@ -140,7 +141,6 @@
     box-shadow: 0 4px 10px rgba(132, 169, 140, 0.3);
   }
 
-  /* 加料區樣式 */
   .topping-group {
     display: grid;
     grid-template-columns: 1fr 1fr;
@@ -166,7 +166,7 @@
   .topping-item input {
     margin-right: 12px;
     transform: scale(1.2);
-    accent-color: var(--primary); /* 讓勾選框也是綠色 */
+    accent-color: var(--primary);
   }
 
   .topping-item span {
@@ -181,7 +181,6 @@
     font-weight: normal;
   }
 
-  /* 底部固定結帳列 */
   .footer-bar {
     position: fixed;
     bottom: 20px;
@@ -209,7 +208,7 @@
   }
   
   .total-price span {
-    color: #e76f51; /* 柔和的紅橙色 */
+    color: #e76f51;
     font-size: 1.4rem;
     margin-left: 5px;
   }
@@ -231,7 +230,6 @@
     transform: scale(0.95);
   }
 
-  /* Loading 動畫 */
   .overlay {
     position: fixed;
     top: 0;

@@ -5,47 +5,266 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>年會工作人員點餐系統</title>
 <style>
-  :root { --primary: #006400; --secondary: #007bff; --bg: #f4f7f4; --text: #333; }
-  body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; background: var(--bg); color: var(--text); margin: 0; padding: 20px; padding-bottom: 80px; }
-  .container { max-width: 600px; margin: 0 auto; background: white; padding: 25px; border-radius: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
-  h1 { text-align: center; color: #333; margin-bottom: 10px; font-weight: 800; }
-  h2 { font-size: 1.1rem; border-left: 5px solid var(--primary); padding-left: 10px; margin-top: 30px; margin-bottom: 15px; color: #444; background: #eee; padding: 8px; border-radius: 0 5px 5px 0; }
+  /* --- 柔和風格配色變數 --- */
+  :root {
+    --primary: #84a98c;   /* 柔和鼠尾草綠 (茶飲) */
+    --primary-dark: #52796f;
+    --secondary: #669bbc; /* 柔和霧霾藍 (餐點) */
+    --bg: #fdfbf7;        /* 溫暖的米白背景 */
+    --text: #555;         /* 深灰文字，不那麼刺眼 */
+    --border: #e0e0e0;
+    --shadow: 0 4px 20px rgba(0,0,0,0.05);
+  }
+
+  body {
+    font-family: "PingFang TC", "Microsoft JhengHei", -apple-system, BlinkMacSystemFont, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    margin: 0;
+    padding: 20px;
+    padding-bottom: 100px; /* 底部留白給固定按鈕 */
+  }
+
+  .container {
+    max-width: 600px;
+    margin: 0 auto;
+    background: white;
+    padding: 30px;
+    border-radius: 20px; /* 大圓角 */
+    box-shadow: var(--shadow);
+    border: 1px solid #f0f0f0;
+  }
+
+  h1 {
+    text-align: center;
+    color: #444;
+    margin-bottom: 5px;
+    font-weight: 700;
+    font-size: 1.6rem;
+    letter-spacing: 1px;
+  }
+
+  p.subtitle {
+    text-align: center;
+    color: #888;
+    font-size: 0.95rem;
+    margin-bottom: 30px;
+  }
+
+  /* 分隔標題樣式優化 */
+  h2 {
+    font-size: 1.1rem;
+    color: #fff;
+    padding: 10px 15px;
+    margin-top: 35px;
+    margin-bottom: 20px;
+    border-radius: 10px;
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+  }
   
-  .section-blue h2 { border-left-color: var(--secondary); color: var(--secondary); background: #eef7ff; }
-  .section-tea h2 { border-left-color: var(--primary); color: var(--primary); background: #f0fff0; }
-
-  .form-group { margin-bottom: 20px; }
-  label { display: block; margin-bottom: 8px; font-weight: bold; color: #444; }
+  .section-blue h2 {
+    background: linear-gradient(135deg, #a2d2ff 0%, #669bbc 100%);
+    box-shadow: 0 4px 10px rgba(102, 155, 188, 0.2);
+  }
   
-  select, input[type="text"] { width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 8px; font-size: 16px; box-sizing: border-box; background: #fff; }
-  select:focus, input:focus { outline: none; border-color: var(--primary); }
+  .section-tea h2 {
+    background: linear-gradient(135deg, #cce3de 0%, #84a98c 100%);
+    box-shadow: 0 4px 10px rgba(132, 169, 140, 0.2);
+    color: #354f52;
+  }
 
-  .btn-group { display: flex; gap: 10px; flex-wrap: wrap; }
-  .btn-option { flex: 1; min-width: 70px; padding: 10px; border: 1px solid #ddd; border-radius: 8px; background: white; text-align: center; cursor: pointer; transition: all 0.2s; font-size: 14px; }
-  .btn-option.active { background: var(--primary); color: white; border-color: var(--primary); font-weight: bold; box-shadow: 0 2px 5px rgba(0,100,0,0.3); }
+  .form-group {
+    margin-bottom: 25px;
+  }
 
-  .topping-group { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-  .topping-item { display: flex; align-items: center; padding: 10px; border: 1px solid #eee; border-radius: 8px; cursor: pointer; }
-  .topping-item input { margin-right: 10px; transform: scale(1.2); }
-  .topping-item span { font-size: 14px; }
-  .price-tag { margin-left: auto; color: #888; font-size: 12px; }
-
-  .footer-bar { position: fixed; bottom: 0; left: 0; width: 100%; background: white; padding: 15px 20px; box-shadow: 0 -2px 10px rgba(0,0,0,0.1); display: flex; justify-content: space-between; align-items: center; box-sizing: border-box; z-index: 100; }
-  .total-price { font-size: 1.2rem; font-weight: bold; color: #e74c3c; }
-  .submit-btn { background: #333; color: white; border: none; padding: 12px 30px; border-radius: 25px; font-size: 16px; font-weight: bold; cursor: pointer; }
+  label {
+    display: block;
+    margin-bottom: 10px;
+    font-weight: 600;
+    color: #666;
+    font-size: 0.95rem;
+  }
   
-  .overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); display: none; justify-content: center; align-items: center; z-index: 200; }
-  .spinner { border: 4px solid #f3f3f3; border-top: 4px solid var(--primary); border-radius: 50%; width: 40px; height: 40px; animation: spin 1s linear infinite; }
+  /* 輸入框與選單柔和化 */
+  select, input[type="text"] {
+    width: 100%;
+    padding: 14px;
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    font-size: 16px;
+    box-sizing: border-box;
+    background: #fafafa;
+    transition: all 0.3s ease;
+    color: #444;
+  }
+
+  select:focus, input:focus {
+    outline: none;
+    border-color: var(--primary);
+    background: white;
+    box-shadow: 0 0 0 3px rgba(132, 169, 140, 0.2);
+  }
+
+  /* 按鈕群組樣式 */
+  .btn-group {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+  }
+
+  .btn-option {
+    flex: 1;
+    min-width: 70px;
+    padding: 12px;
+    border: 1px solid var(--border);
+    border-radius: 50px; /* 膠囊狀 */
+    background: white;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    font-size: 14px;
+    color: #777;
+  }
+
+  .btn-option:hover {
+    background: #f1f1f1;
+  }
+
+  .btn-option.active {
+    background: var(--primary);
+    color: white;
+    border-color: var(--primary);
+    font-weight: 600;
+    box-shadow: 0 4px 10px rgba(132, 169, 140, 0.3);
+  }
+
+  /* 加料區樣式 */
+  .topping-group {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+  }
+
+  .topping-item {
+    display: flex;
+    align-items: center;
+    padding: 12px;
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    cursor: pointer;
+    background: #fafafa;
+    transition: all 0.2s;
+  }
+  
+  .topping-item:hover {
+    background: #fff;
+    border-color: #ccc;
+  }
+
+  .topping-item input {
+    margin-right: 12px;
+    transform: scale(1.2);
+    accent-color: var(--primary); /* 讓勾選框也是綠色 */
+  }
+
+  .topping-item span {
+    font-size: 14px;
+    color: #555;
+  }
+
+  .price-tag {
+    margin-left: auto;
+    color: #999;
+    font-size: 12px;
+    font-weight: normal;
+  }
+
+  /* 底部固定結帳列 */
+  .footer-bar {
+    position: fixed;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 90%;
+    max-width: 560px;
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(10px);
+    padding: 15px 25px;
+    border-radius: 50px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    box-sizing: border-box;
+    z-index: 100;
+    border: 1px solid rgba(255,255,255,0.5);
+  }
+
+  .total-price {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: #444;
+  }
+  
+  .total-price span {
+    color: #e76f51; /* 柔和的紅橙色 */
+    font-size: 1.4rem;
+    margin-left: 5px;
+  }
+
+  .submit-btn {
+    background: #444;
+    color: white;
+    border: none;
+    padding: 12px 35px;
+    border-radius: 50px;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: transform 0.1s, background 0.2s;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+  }
+
+  .submit-btn:active {
+    transform: scale(0.95);
+  }
+
+  /* Loading 動畫 */
+  .overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(255,255,255,0.8);
+    display: none;
+    justify-content: center;
+    align-items: center;
+    z-index: 200;
+    backdrop-filter: blur(2px);
+  }
+
+  .spinner {
+    border: 4px solid #f3f3f3;
+    border-top: 4px solid var(--primary);
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+    animation: spin 1s linear infinite;
+  }
+
   @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
   
-  .disabled-section { opacity: 0.5; pointer-events: none; }
+  .disabled-section { opacity: 0.4; pointer-events: none; filter: grayscale(1); transition: all 0.3s; }
 </style>
 </head>
 <body>
 
 <div class="container">
   <h1>年會工作人員點餐系統</h1>
-  <p style="text-align:center; color:#666; font-size:0.9rem;">Mr.布魯 & 鮮自然</p>
+  <p class="subtitle">Mr.布魯 & 鮮自然</p>
 
   <div class="form-group">
     <label>選擇店別</label>
@@ -135,7 +354,7 @@
 </div>
 
 <div class="footer-bar">
-  <div class="total-price">總計：$<span id="totalDisplay">0</span></div>
+  <div class="total-price">總計 $<span id="totalDisplay">0</span></div>
   <button class="submit-btn" onclick="submitOrder()">確認送出</button>
 </div>
 <div class="overlay" id="loading"><div class="spinner"></div></div>
@@ -349,7 +568,6 @@
       .then(response => {
         document.getElementById('loading').style.display = 'none';
         
-        // 這裡修改為彈出對話框詢問
         if (confirm("登記完成！\n\n要前往「確認清單」查看嗎？\n(按「確定」前往清單，按「取消」繼續點下一筆)")) {
           window.location.href = 'https://docs.google.com/spreadsheets/d/1geUNuIUMUpFhuSc9G2uqHmZRJd_09M9TzEhr16Hkjyo/edit?usp=sharing';
         } else {

@@ -3,13 +3,17 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>鮮自然 Natural First 訂購單</title>
+<title>Mr.布魯 & 鮮自然 聯合訂購單</title>
 <style>
-  :root { --primary: #006400; --bg: #f4f7f4; --text: #333; }
+  :root { --primary: #006400; --secondary: #007bff; --bg: #f4f7f4; --text: #333; }
   body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; background: var(--bg); color: var(--text); margin: 0; padding: 20px; padding-bottom: 80px; }
   .container { max-width: 600px; margin: 0 auto; background: white; padding: 25px; border-radius: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
-  h1 { text-align: center; color: var(--primary); margin-bottom: 20px; font-weight: 800; }
+  h1 { text-align: center; color: #333; margin-bottom: 10px; font-weight: 800; }
+  h2 { font-size: 1.1rem; border-left: 5px solid var(--primary); padding-left: 10px; margin-top: 30px; margin-bottom: 15px; color: #444; background: #eee; padding: 8px; border-radius: 0 5px 5px 0; }
   
+  .section-blue h2 { border-left-color: var(--secondary); color: var(--secondary); background: #eef7ff; }
+  .section-tea h2 { border-left-color: var(--primary); color: var(--primary); background: #f0fff0; }
+
   .form-group { margin-bottom: 20px; }
   label { display: block; margin-bottom: 8px; font-weight: bold; color: #444; }
   
@@ -27,21 +31,24 @@
   .price-tag { margin-left: auto; color: #888; font-size: 12px; }
 
   .footer-bar { position: fixed; bottom: 0; left: 0; width: 100%; background: white; padding: 15px 20px; box-shadow: 0 -2px 10px rgba(0,0,0,0.1); display: flex; justify-content: space-between; align-items: center; box-sizing: border-box; z-index: 100; }
-  .total-price { font-size: 1.2rem; font-weight: bold; color: var(--primary); }
-  .submit-btn { background: var(--primary); color: white; border: none; padding: 12px 30px; border-radius: 25px; font-size: 16px; font-weight: bold; cursor: pointer; }
+  .total-price { font-size: 1.2rem; font-weight: bold; color: #e74c3c; }
+  .submit-btn { background: #333; color: white; border: none; padding: 12px 30px; border-radius: 25px; font-size: 16px; font-weight: bold; cursor: pointer; }
   
   .overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); display: none; justify-content: center; align-items: center; z-index: 200; }
   .spinner { border: 4px solid #f3f3f3; border-top: 4px solid var(--primary); border-radius: 50%; width: 40px; height: 40px; animation: spin 1s linear infinite; }
   @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+  
+  .disabled-section { opacity: 0.5; pointer-events: none; }
 </style>
 </head>
 <body>
 
 <div class="container">
-  <h1>鮮自然 點餐系統</h1>
+  <h1>Mr.布魯 & 鮮自然</h1>
+  <p style="text-align:center; color:#666; font-size:0.9rem;">聯合訂購系統</p>
 
   <div class="form-group">
-    <label>選擇店別</label>
+    <label>選擇店別 (鮮自然)</label>
     <select id="store">
       <option value="" disabled selected>請選擇...</option>
     </select>
@@ -52,42 +59,70 @@
     <input type="text" id="username" placeholder="請輸入姓名">
   </div>
 
-  <div class="form-group">
-    <label>選擇飲品</label>
-    <select id="drink" onchange="calcTotal()">
-      <option value="0" data-name="" selected disabled>請選擇飲品...</option>
-    </select>
-  </div>
-
-  <div class="form-group">
-    <label>加料區 (可複選)</label>
-    <div class="topping-group" id="toppingGroup"></div>
-  </div>
-
-  <div class="form-group">
-    <label>甜度</label>
-    <div class="btn-group" id="sugarGroup">
-      <div class="btn-option" onclick="selectOption('sugar', this)">無糖</div>
-      <div class="btn-option" onclick="selectOption('sugar', this)">微糖</div>
-      <div class="btn-option" onclick="selectOption('sugar', this)">半糖</div>
-      <div class="btn-option" onclick="selectOption('sugar', this)">少糖</div>
-      <div class="btn-option" onclick="selectOption('sugar', this)">正常</div>
+  <div class="section-blue">
+    <h2>🍴 Mr.布魯 - 健康水煮餐</h2>
+    
+    <div class="form-group">
+      <label>選擇餐點</label>
+      <select id="food" onchange="checkFoodLogic()">
+        <option value="0" data-name="" selected>本次不點餐 (僅點飲料)</option>
+        </select>
     </div>
-    <input type="hidden" id="sugar" value="">
-  </div>
 
-  <div class="form-group">
-    <label>冰塊</label>
-    <div class="btn-group" id="iceGroup">
-      <div class="btn-option" onclick="selectOption('ice', this)">去冰</div>
-      <div class="btn-option" onclick="selectOption('ice', this)">微冰</div>
-      <div class="btn-option" onclick="selectOption('ice', this)">少冰</div>
-      <div class="btn-option" onclick="selectOption('ice', this)">正常</div>
+    <div class="form-group" id="sauceContainer" style="display:none;">
+      <label>選擇醬料</label>
+      <select id="sauce">
+        <option value="" disabled selected>請選擇醬料...</option>
+        <option value="香醇胡麻醬">香醇胡麻醬</option>
+        <option value="泰式辣雞醬">泰式辣雞醬</option>
+        <option value="蜂蜜芥末醬">蜂蜜芥末醬</option>
+        <option value="日式和風醬">日式和風醬</option>
+      </select>
     </div>
-    <input type="hidden" id="ice" value="">
   </div>
 
-  <div class="form-group">
+  <div class="section-tea">
+    <h2>🥤 鮮自然 - 茶飲</h2>
+
+    <div class="form-group">
+      <label>選擇飲品</label>
+      <select id="drink" onchange="checkDrinkLogic()">
+        <option value="0" data-name="" selected>本次不點飲料 (僅點餐)</option>
+        </select>
+    </div>
+
+    <div id="drinkOptions" style="display:none;">
+      <div class="form-group">
+        <label>加料區 (可複選)</label>
+        <div class="topping-group" id="toppingGroup"></div>
+      </div>
+
+      <div class="form-group">
+        <label>甜度</label>
+        <div class="btn-group" id="sugarGroup">
+          <div class="btn-option" onclick="selectOption('sugar', this)">無糖</div>
+          <div class="btn-option" onclick="selectOption('sugar', this)">微糖</div>
+          <div class="btn-option" onclick="selectOption('sugar', this)">半糖</div>
+          <div class="btn-option" onclick="selectOption('sugar', this)">少糖</div>
+          <div class="btn-option" onclick="selectOption('sugar', this)">正常</div>
+        </div>
+        <input type="hidden" id="sugar" value="">
+      </div>
+
+      <div class="form-group">
+        <label>冰塊</label>
+        <div class="btn-group" id="iceGroup">
+          <div class="btn-option" onclick="selectOption('ice', this)">去冰</div>
+          <div class="btn-option" onclick="selectOption('ice', this)">微冰</div>
+          <div class="btn-option" onclick="selectOption('ice', this)">少冰</div>
+          <div class="btn-option" onclick="selectOption('ice', this)">正常</div>
+        </div>
+        <input type="hidden" id="ice" value="">
+      </div>
+    </div>
+  </div>
+
+  <div class="form-group" style="margin-top:30px;">
     <label>備註</label>
     <input type="text" id="note" placeholder="">
   </div>
@@ -100,11 +135,33 @@
 <div class="overlay" id="loading"><div class="spinner"></div></div>
 
 <script>
-  // 網址維持不變
-  const scriptURL = 'https://script.google.com/macros/s/AKfycbyCHJvYc1JjIvsLIp9ChPxdLiS9PdITVpC48gbdtd0DaHykhVAbmafwjstkY1z8rLLtww/exec';
+  // ▼▼▼ 已更新為您的新網址 ▼▼▼
+  const scriptURL = 'https://script.google.com/macros/s/AKfycbxWT5k-8KpvjMsJJfFweNpwMoCt_rXCKeysqQeI9QoUpjoYzJ_LKe1nh-ixG2DcEaHx/exec';
 
   const stores = ['湖美', '成大', '北安', '安平', '開元', '崇善', '文元', '市府', '後甲', '佳里', '民生', '東橋', '歸仁', '嘉義忠孝', '大同', '安南', '塩行', '裕忠', '善化', '新營', '海佃', '新市', '北門', '九份子', '崇明', '麻豆', '仁德', '大灣', '小北店', '水交社店', '永華店', '南工店', '聿川建設', '品川設計', '代銷'];
   
+  const foods = [
+    {category: '雞胸系列', items: [
+      {name: '胡椒海鹽雞胸', price: 100}, {name: '墨西哥嫩雞胸', price: 100},
+      {name: '香蒜椒鹽嫩雞胸', price: 105}, {name: '熔岩起司嫩雞胸', price: 110}
+    ]},
+    {category: '雞腿系列', items: [
+      {name: '胡椒海鹽雞腿', price: 115}, {name: '香檸炙燒雞腿', price: 115},
+      {name: '蜂蜜照燒雞腿', price: 115}
+    ]},
+    {category: '豬肉系列', items: [
+      {name: '韓式泡菜梅花豬', price: 100}, {name: '泰式打拋豬', price: 115},
+      {name: '玫瑰鹽烤松阪豬', price: 140}
+    ]},
+    {category: '牛肉系列', items: [
+      {name: '香蒜椒鹽牛五花', price: 120}, {name: '蒜香鹽烤板腱牛', price: 145}
+    ]},
+    {category: '素食/海鮮', items: [
+      {name: '香園蔬食(素)', price: 85}, {name: '胡椒海鹽台灣鯛', price: 115},
+      {name: '香檸椒鹽台灣鯛', price: 115}
+    ]}
+  ];
+
   const drinks = [
     {name: '淺蒸·日式煎茶', price: 45}, {name: '淺焙·手摘烏龍', price: 55}, {name: '深焙·珍藏黑烏龍', price: 70},
     {name: '淺焙·大禹嶺茶王', price: 120}, {name: '白毫·東方美人紅', price: 120}, {name: '檸檬·手摘烏龍', price: 65},
@@ -138,6 +195,20 @@
       storeSelect.appendChild(opt);
     });
 
+    const foodSelect = document.getElementById('food');
+    foods.forEach(category => {
+      let group = document.createElement('optgroup');
+      group.label = category.category;
+      category.items.forEach(item => {
+        let opt = document.createElement('option');
+        opt.value = item.price;
+        opt.dataset.name = item.name;
+        opt.innerHTML = `${item.name} ($${item.price})`;
+        group.appendChild(opt);
+      });
+      foodSelect.appendChild(group);
+    });
+
     const drinkSelect = document.getElementById('drink');
     drinks.forEach(d => {
       let opt = document.createElement('option');
@@ -157,6 +228,33 @@
     });
   };
 
+  function checkFoodLogic() {
+    const foodSelect = document.getElementById('food');
+    const sauceDiv = document.getElementById('sauceContainer');
+    if (foodSelect.selectedIndex > 0) { 
+        sauceDiv.style.display = 'block';
+    } else {
+        sauceDiv.style.display = 'none';
+        document.getElementById('sauce').selectedIndex = 0; 
+    }
+    calcTotal();
+  }
+
+  function checkDrinkLogic() {
+    const drinkSelect = document.getElementById('drink');
+    const optionsDiv = document.getElementById('drinkOptions');
+    if (drinkSelect.selectedIndex > 0) { 
+        optionsDiv.style.display = 'block';
+    } else {
+        optionsDiv.style.display = 'none';
+        document.querySelectorAll('#toppingGroup input').forEach(box => box.checked = false);
+        document.getElementById('sugar').value = '';
+        document.getElementById('ice').value = '';
+        document.querySelectorAll('.btn-option').forEach(btn => btn.classList.remove('active'));
+    }
+    calcTotal();
+  }
+
   function selectOption(type, element) {
     document.getElementById(type).value = element.innerText;
     let group = document.getElementById(type + 'Group');
@@ -165,46 +263,72 @@
   }
 
   function calcTotal() {
-    let basePrice = parseInt(document.getElementById('drink').value) || 0;
+    let foodPrice = parseInt(document.getElementById('food').value) || 0;
+    let drinkPrice = parseInt(document.getElementById('drink').value) || 0;
     let toppingPrice = 0;
+    
     document.querySelectorAll('#toppingGroup input:checked').forEach(box => {
       toppingPrice += parseInt(box.value);
     });
-    document.getElementById('totalDisplay').innerText = basePrice + toppingPrice;
+    
+    document.getElementById('totalDisplay').innerText = foodPrice + drinkPrice + toppingPrice;
   }
 
   function submitOrder() {
     const store = document.getElementById('store').value;
     const username = document.getElementById('username').value.trim();
-    const drinkSelect = document.getElementById('drink');
-    const drinkName = drinkSelect.selectedIndex > 0 ? drinkSelect.options[drinkSelect.selectedIndex].dataset.name : '';
-    const sugar = document.getElementById('sugar').value;
-    const ice = document.getElementById('ice').value;
     const note = document.getElementById('note').value;
     
+    // 計算金額拆帳
+    const foodSelect = document.getElementById('food');
+    const foodName = foodSelect.selectedIndex > 0 ? foodSelect.options[foodSelect.selectedIndex].dataset.name : '';
+    const foodPrice = parseInt(foodSelect.value) || 0;
+    const sauce = document.getElementById('sauce').value;
+
+    const drinkSelect = document.getElementById('drink');
+    const drinkName = drinkSelect.selectedIndex > 0 ? drinkSelect.options[drinkSelect.selectedIndex].dataset.name : '';
+    const drinkBasePrice = parseInt(drinkSelect.value) || 0;
+    const sugar = document.getElementById('sugar').value;
+    const ice = document.getElementById('ice').value;
+    
     let toppingArr = [];
+    let toppingPrice = 0;
     document.querySelectorAll('#toppingGroup input:checked').forEach(box => {
       toppingArr.push(box.dataset.name);
+      toppingPrice += parseInt(box.value);
     });
-    const toppingStr = toppingArr.length > 0 ? toppingArr.join(', ') : '無';
-    const finalPrice = document.getElementById('totalDisplay').innerText;
+    const toppingStr = toppingArr.length > 0 ? toppingArr.join(', ') : '';
+    
+    // 飲料總金額 = 飲料基底 + 加料
+    const drinkTotalPrice = drinkBasePrice + toppingPrice;
+    
+    // 總金額
+    const totalFinal = foodPrice + drinkTotalPrice;
 
+    // 驗證
     if(!store) { alert('請選擇店別'); return; }
     if(!username) { alert('請輸入您的姓名'); return; }
-    if(!drinkName) { alert('請選擇飲品'); return; }
-    if(!sugar) { alert('請選擇甜度'); return; }
-    if(!ice) { alert('請選擇冰塊'); return; }
+    if(!foodName && !drinkName) { alert('請至少選擇一份餐點或飲料'); return; }
+    if(foodName && !sauce) { alert('請選擇餐點的醬料'); return; }
+    if(drinkName) {
+        if(!sugar) { alert('請選擇飲料甜度'); return; }
+        if(!ice) { alert('請選擇飲料冰塊'); return; }
+    }
 
     document.getElementById('loading').style.display = 'flex';
 
     const formData = new FormData();
     formData.append('store', store);
     formData.append('name', username);
+    formData.append('food', foodName);
+    formData.append('food_price', foodPrice);          // 傳送餐點金額
+    formData.append('sauce', sauce);
     formData.append('drink', drinkName);
+    formData.append('drink_price', drinkTotalPrice);   // 傳送飲料總金額(含加料)
+    formData.append('toppings', toppingStr);
     formData.append('sugar', sugar);
     formData.append('ice', ice);
-    formData.append('toppings', toppingStr);
-    formData.append('price', finalPrice);
+    formData.append('total_price', totalFinal);        // 傳送總金額
     formData.append('note', note);
 
     fetch(scriptURL, { method: 'POST', body: formData })

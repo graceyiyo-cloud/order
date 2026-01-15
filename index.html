@@ -9,7 +9,9 @@
   body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; background: var(--bg); color: var(--text); margin: 0; padding: 20px; padding-bottom: 80px; }
   .container { max-width: 600px; margin: 0 auto; background: white; padding: 25px; border-radius: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
   h1 { text-align: center; color: var(--primary); margin-bottom: 20px; font-weight: 800; }
-  .logo { text-align: center; margin-bottom: 10px; font-size: 1.2rem; color: #666; letter-spacing: 2px;}
+  
+  /* 菜單圖片樣式 */
+  .menu-image { width: 100%; height: auto; border-radius: 10px; margin-bottom: 20px; border: 1px solid #eee; }
   
   .form-group { margin-bottom: 20px; }
   label { display: block; margin-bottom: 8px; font-weight: bold; color: #444; }
@@ -30,6 +32,7 @@
   .footer-bar { position: fixed; bottom: 0; left: 0; width: 100%; background: white; padding: 15px 20px; box-shadow: 0 -2px 10px rgba(0,0,0,0.1); display: flex; justify-content: space-between; align-items: center; box-sizing: border-box; z-index: 100; }
   .total-price { font-size: 1.2rem; font-weight: bold; color: var(--primary); }
   .submit-btn { background: var(--primary); color: white; border: none; padding: 12px 30px; border-radius: 25px; font-size: 16px; font-weight: bold; cursor: pointer; }
+  
   .overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); display: none; justify-content: center; align-items: center; z-index: 200; }
   .spinner { border: 4px solid #f3f3f3; border-top: 4px solid var(--primary); border-radius: 50%; width: 40px; height: 40px; animation: spin 1s linear infinite; }
   @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
@@ -38,17 +41,14 @@
 <body>
 
 <div class="container">
-  <div class="logo">NATURAL FIRST</div>
+  <img src="image_0.png" alt="鮮自然菜單" class="menu-image">
+
   <h1>鮮自然 點餐系統</h1>
 
   <div class="form-group">
     <label>選擇店別</label>
     <select id="store">
       <option value="" disabled selected>請選擇...</option>
-      <script>
-        const stores = ['湖美', '成大', '北安', '安平', '開元', '崇善', '文元', '市府', '後甲', '佳里', '民生', '東橋', '歸仁', '嘉義忠孝', '大同', '安南', '塩行', '裕忠', '善化', '新營', '海佃', '新市', '北門', '九份子', '崇明', '麻豆', '仁德', '大灣', '小北店', '水交社店', '永華店', '南工店', '聿川建設', '品川設計', '代銷'];
-        document.write(stores.map(s => `<option value="${s}">${s}</option>`).join(''));
-      </script>
     </select>
   </div>
 
@@ -62,6 +62,11 @@
     <select id="drink" onchange="calcTotal()">
       <option value="0" data-name="" selected disabled>請選擇飲品...</option>
     </select>
+  </div>
+
+  <div class="form-group">
+    <label>加料區 (可複選)</label>
+    <div class="topping-group" id="toppingGroup"></div>
   </div>
 
   <div class="form-group">
@@ -88,11 +93,6 @@
   </div>
 
   <div class="form-group">
-    <label>加料區 (可複選)</label>
-    <div class="topping-group" id="toppingGroup"></div>
-  </div>
-
-  <div class="form-group">
     <label>備註 (載具/其他)</label>
     <input type="text" id="note" placeholder="例如：珍珠要軟一點、載具號碼...">
   </div>
@@ -105,7 +105,11 @@
 <div class="overlay" id="loading"><div class="spinner"></div></div>
 
 <script>
-  // --- 設定資料 ---
+  // 已幫您填入正確的 Google Script 網址
+  const scriptURL = 'https://script.google.com/macros/s/AKfycbyCHJvYc1JjIvsLIp9ChPxdLiS9PdITVpC48gbdtd0DaHykhVAbmafwjstkY1z8rLLtww/exec';
+
+  const stores = ['湖美', '成大', '北安', '安平', '開元', '崇善', '文元', '市府', '後甲', '佳里', '民生', '東橋', '歸仁', '嘉義忠孝', '大同', '安南', '塩行', '裕忠', '善化', '新營', '海佃', '新市', '北門', '九份子', '崇明', '麻豆', '仁德', '大灣', '小北店', '水交社店', '永華店', '南工店', '聿川建設', '品川設計', '代銷'];
+  
   const drinks = [
     {name: '淺蒸·日式煎茶', price: 45}, {name: '淺焙·手摘烏龍', price: 55}, {name: '深焙·珍藏黑烏龍', price: 70},
     {name: '淺焙·大禹嶺茶王', price: 120}, {name: '白毫·東方美人紅', price: 120}, {name: '檸檬·手摘烏龍', price: 65},
@@ -130,24 +134,33 @@
     {name: '加厚奶', price: 10}, {name: '加鮮奶', price: 20}, {name: '加龍眼蜜', price: 30}
   ];
 
-  // --- 初始化畫面 ---
-  const drinkSelect = document.getElementById('drink');
-  drinks.forEach(d => {
-    let opt = document.createElement('option');
-    opt.value = d.price;
-    opt.dataset.name = d.name;
-    opt.innerHTML = `${d.name} ($${d.price})`;
-    drinkSelect.appendChild(opt);
-  });
+  window.onload = function() {
+    const storeSelect = document.getElementById('store');
+    stores.forEach(s => {
+      let opt = document.createElement('option');
+      opt.value = s;
+      opt.text = s;
+      storeSelect.appendChild(opt);
+    });
 
-  const toppingDiv = document.getElementById('toppingGroup');
-  toppings.forEach(t => {
-    let label = document.createElement('label');
-    label.className = 'topping-item';
-    label.innerHTML = `<input type="checkbox" value="${t.price}" data-name="${t.name}" onchange="calcTotal()"> 
-                       <span>${t.name}</span> <span class="price-tag">+$${t.price}</span>`;
-    toppingDiv.appendChild(label);
-  });
+    const drinkSelect = document.getElementById('drink');
+    drinks.forEach(d => {
+      let opt = document.createElement('option');
+      opt.value = d.price;
+      opt.dataset.name = d.name;
+      opt.innerHTML = `${d.name} ($${d.price})`;
+      drinkSelect.appendChild(opt);
+    });
+
+    const toppingDiv = document.getElementById('toppingGroup');
+    toppings.forEach(t => {
+      let label = document.createElement('label');
+      label.className = 'topping-item';
+      label.innerHTML = `<input type="checkbox" value="${t.price}" data-name="${t.name}" onchange="calcTotal()"> 
+                         <span>${t.name}</span> <span class="price-tag">+$${t.price}</span>`;
+      toppingDiv.appendChild(label);
+    });
+  };
 
   function selectOption(type, element) {
     document.getElementById(type).value = element.innerText;
@@ -166,15 +179,10 @@
   }
 
   function submitOrder() {
-    // ▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼
-    // 請在這裡貼上您的 Google Script 網址
-    const scriptURL = 'https://script.google.com/macros/s/AKfycbyCHJvYc1JjIvsLIp9ChPxdLiS9PdITVpC48gbdtd0DaHykhVAbmafwjstkY1z8rLLtww/exec';
-    // ▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲
-
     const store = document.getElementById('store').value;
     const username = document.getElementById('username').value.trim();
     const drinkSelect = document.getElementById('drink');
-    const drinkName = drinkSelect.options[drinkSelect.selectedIndex].dataset.name;
+    const drinkName = drinkSelect.selectedIndex > 0 ? drinkSelect.options[drinkSelect.selectedIndex].dataset.name : '';
     const sugar = document.getElementById('sugar').value;
     const ice = document.getElementById('ice').value;
     const note = document.getElementById('note').value;
@@ -186,7 +194,6 @@
     const toppingStr = toppingArr.length > 0 ? toppingArr.join(', ') : '無';
     const finalPrice = document.getElementById('totalDisplay').innerText;
 
-    if(scriptURL.includes("您的")) { alert('程式碼還沒貼上網址喔！'); return; }
     if(!store) { alert('請選擇店別'); return; }
     if(!username) { alert('請輸入您的姓名'); return; }
     if(!drinkName) { alert('請選擇飲品'); return; }
@@ -208,12 +215,12 @@
     fetch(scriptURL, { method: 'POST', body: formData })
       .then(response => {
         document.getElementById('loading').style.display = 'none';
-        alert(`訂購成功！\n${username} 您的金額是 $${finalPrice}`);
+        alert('登記完成'); 
         window.location.reload(); 
       })
       .catch(error => {
         document.getElementById('loading').style.display = 'none';
-        alert('發生錯誤，請稍後再試！');
+        alert('發生錯誤，請稍後再試');
       });
   }
 </script>

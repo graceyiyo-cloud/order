@@ -79,6 +79,11 @@
         <option value="日式和風醬">日式和風醬</option>
       </select>
     </div>
+
+    <div class="form-group" id="foodNoteContainer" style="display:none;">
+        <label>餐點備註</label>
+        <input type="text" id="food_note" placeholder="例如：不要洋蔥、飯少...">
+    </div>
   </div>
 
   <div class="section-tea">
@@ -119,13 +124,14 @@
         </div>
         <input type="hidden" id="ice" value="">
       </div>
+
+      <div class="form-group">
+        <label>飲料備註</label>
+        <input type="text" id="drink_note" placeholder="例如：要溫的、分開裝...">
+      </div>
     </div>
   </div>
 
-  <div class="form-group" style="margin-top:30px;">
-    <label>備註</label>
-    <input type="text" id="note" placeholder="">
-  </div>
 </div>
 
 <div class="footer-bar">
@@ -135,10 +141,9 @@
 <div class="overlay" id="loading"><div class="spinner"></div></div>
 
 <script>
-  // 網址維持不變
+  // 網址 (維持不變)
   const scriptURL = 'https://script.google.com/macros/s/AKfycbxWT5k-8KpvjMsJJfFweNpwMoCt_rXCKeysqQeI9QoUpjoYzJ_LKe1nh-ixG2DcEaHx/exec';
 
-  // 已更新店別清單
   const stores = ['湖美', '成大', '北安', '安平', '開元', '崇善', '文元', '市府', '後甲', '佳里', '總管處'];
   
   const foods = [
@@ -232,11 +237,15 @@
   function checkFoodLogic() {
     const foodSelect = document.getElementById('food');
     const sauceDiv = document.getElementById('sauceContainer');
+    const noteDiv = document.getElementById('foodNoteContainer'); // 餐點備註
     if (foodSelect.selectedIndex > 0) { 
         sauceDiv.style.display = 'block';
+        noteDiv.style.display = 'block';
     } else {
         sauceDiv.style.display = 'none';
+        noteDiv.style.display = 'none';
         document.getElementById('sauce').selectedIndex = 0; 
+        document.getElementById('food_note').value = '';
     }
     calcTotal();
   }
@@ -251,6 +260,7 @@
         document.querySelectorAll('#toppingGroup input').forEach(box => box.checked = false);
         document.getElementById('sugar').value = '';
         document.getElementById('ice').value = '';
+        document.getElementById('drink_note').value = '';
         document.querySelectorAll('.btn-option').forEach(btn => btn.classList.remove('active'));
     }
     calcTotal();
@@ -278,19 +288,21 @@
   function submitOrder() {
     const store = document.getElementById('store').value;
     const username = document.getElementById('username').value.trim();
-    const note = document.getElementById('note').value;
     
-    // 計算金額拆帳
+    // 餐點資料
     const foodSelect = document.getElementById('food');
     const foodName = foodSelect.selectedIndex > 0 ? foodSelect.options[foodSelect.selectedIndex].dataset.name : '';
     const foodPrice = parseInt(foodSelect.value) || 0;
     const sauce = document.getElementById('sauce').value;
+    const foodNote = document.getElementById('food_note').value; // 新增
 
+    // 飲料資料
     const drinkSelect = document.getElementById('drink');
     const drinkName = drinkSelect.selectedIndex > 0 ? drinkSelect.options[drinkSelect.selectedIndex].dataset.name : '';
     const drinkBasePrice = parseInt(drinkSelect.value) || 0;
     const sugar = document.getElementById('sugar').value;
     const ice = document.getElementById('ice').value;
+    const drinkNote = document.getElementById('drink_note').value; // 新增
     
     let toppingArr = [];
     let toppingPrice = 0;
@@ -299,6 +311,7 @@
       toppingPrice += parseInt(box.value);
     });
     const toppingStr = toppingArr.length > 0 ? toppingArr.join(', ') : '';
+    
     const drinkTotalPrice = drinkBasePrice + toppingPrice;
     const totalFinal = foodPrice + drinkTotalPrice;
 
@@ -317,16 +330,20 @@
     const formData = new FormData();
     formData.append('store', store);
     formData.append('name', username);
+    
     formData.append('food', foodName);
-    formData.append('food_price', foodPrice);          
+    formData.append('food_note', foodNote);  // 新增
+    formData.append('food_price', foodPrice);
     formData.append('sauce', sauce);
+    
     formData.append('drink', drinkName);
-    formData.append('drink_price', drinkTotalPrice);   
     formData.append('toppings', toppingStr);
     formData.append('sugar', sugar);
     formData.append('ice', ice);
-    formData.append('total_price', totalFinal);        
-    formData.append('note', note);
+    formData.append('drink_note', drinkNote); // 新增
+    formData.append('drink_price', drinkTotalPrice);
+    
+    formData.append('total_price', totalFinal);
 
     fetch(scriptURL, { method: 'POST', body: formData })
       .then(response => {

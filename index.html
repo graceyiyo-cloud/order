@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Mr.布魯 & 鮮自然 聯合訂購單</title>
+<title>年會工作人員點餐系統</title>
 <style>
   :root { --primary: #006400; --secondary: #007bff; --bg: #f4f7f4; --text: #333; }
   body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; background: var(--bg); color: var(--text); margin: 0; padding: 20px; padding-bottom: 80px; }
@@ -44,8 +44,8 @@
 <body>
 
 <div class="container">
-  <h1>Mr.布魯 & 鮮自然</h1>
-  <p style="text-align:center; color:#666; font-size:0.9rem;">聯合訂購系統</p>
+  <h1>年會工作人員點餐系統</h1>
+  <p style="text-align:center; color:#666; font-size:0.9rem;">Mr.布魯 & 鮮自然</p>
 
   <div class="form-group">
     <label>選擇店別</label>
@@ -127,7 +127,7 @@
 
       <div class="form-group">
         <label>飲料備註</label>
-        <input type="text" id="drink_note" placeholder="例如：要溫的、分開裝...">
+        <input type="text" id="drink_note" placeholder="">
       </div>
     </div>
   </div>
@@ -237,7 +237,7 @@
   function checkFoodLogic() {
     const foodSelect = document.getElementById('food');
     const sauceDiv = document.getElementById('sauceContainer');
-    const noteDiv = document.getElementById('foodNoteContainer'); // 餐點備註
+    const noteDiv = document.getElementById('foodNoteContainer'); 
     if (foodSelect.selectedIndex > 0) { 
         sauceDiv.style.display = 'block';
         noteDiv.style.display = 'block';
@@ -294,7 +294,7 @@
     const foodName = foodSelect.selectedIndex > 0 ? foodSelect.options[foodSelect.selectedIndex].dataset.name : '';
     const foodPrice = parseInt(foodSelect.value) || 0;
     const sauce = document.getElementById('sauce').value;
-    const foodNote = document.getElementById('food_note').value; // 新增
+    const foodNote = document.getElementById('food_note').value; 
 
     // 飲料資料
     const drinkSelect = document.getElementById('drink');
@@ -302,7 +302,7 @@
     const drinkBasePrice = parseInt(drinkSelect.value) || 0;
     const sugar = document.getElementById('sugar').value;
     const ice = document.getElementById('ice').value;
-    const drinkNote = document.getElementById('drink_note').value; // 新增
+    const drinkNote = document.getElementById('drink_note').value;
     
     let toppingArr = [];
     let toppingPrice = 0;
@@ -332,7 +332,7 @@
     formData.append('name', username);
     
     formData.append('food', foodName);
-    formData.append('food_note', foodNote);  // 新增
+    formData.append('food_note', foodNote); 
     formData.append('food_price', foodPrice);
     formData.append('sauce', sauce);
     
@@ -340,7 +340,7 @@
     formData.append('toppings', toppingStr);
     formData.append('sugar', sugar);
     formData.append('ice', ice);
-    formData.append('drink_note', drinkNote); // 新增
+    formData.append('drink_note', drinkNote);
     formData.append('drink_price', drinkTotalPrice);
     
     formData.append('total_price', totalFinal);
@@ -348,8 +348,13 @@
     fetch(scriptURL, { method: 'POST', body: formData })
       .then(response => {
         document.getElementById('loading').style.display = 'none';
-        alert('登記完成'); 
-        window.location.reload(); 
+        
+        // 這裡修改為彈出對話框詢問
+        if (confirm("登記完成！\n\n要前往「確認清單」查看嗎？\n(按「確定」前往清單，按「取消」繼續點下一筆)")) {
+          window.location.href = 'https://docs.google.com/spreadsheets/d/1geUNuIUMUpFhuSc9G2uqHmZRJd_09M9TzEhr16Hkjyo/edit?usp=sharing';
+        } else {
+          window.location.reload();
+        }
       })
       .catch(error => {
         document.getElementById('loading').style.display = 'none';

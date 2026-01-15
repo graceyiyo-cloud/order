@@ -7,14 +7,15 @@
 <meta property="og:title" content="年會工作人員點餐系統">
 <meta property="og:description" content="Mr.布魯 & 鮮自然">
 <meta property="og:type" content="website">
+
 <title>年會工作人員點餐系統</title>
 <style>
-  /* --- 柔和風格配色變數 --- */
+  /* --- 柔和風格配色 --- */
   :root {
-    --primary: #84a98c;   /* 柔和鼠尾草綠 (茶飲) */
+    --primary: #84a98c;   /* 柔和鼠尾草綠 */
     --primary-dark: #52796f;
-    --secondary: #669bbc; /* 柔和霧霾藍 (餐點) */
-    --bg: #fdfbf7;        /* 溫暖的米白背景 */
+    --secondary: #669bbc; /* 柔和霧霾藍 */
+    --bg: #fdfbf7;        /* 米白背景 */
     --text: #555;         /* 深灰文字 */
     --border: #e0e0e0;
     --shadow: 0 4px 20px rgba(0,0,0,0.05);
@@ -67,16 +68,20 @@
     align-items: center;
   }
   
+  /* ▼▼▼ 修改這裡：改成深到淺的漸層 ▼▼▼ */
   .section-blue h2 {
-    background: linear-gradient(135deg, #a2d2ff 0%, #669bbc 100%);
+    /* 原本是淺到深，現在顏色對調 */
+    background: linear-gradient(135deg, #669bbc 0%, #a2d2ff 100%);
     box-shadow: 0 4px 10px rgba(102, 155, 188, 0.2);
   }
   
   .section-tea h2 {
-    background: linear-gradient(135deg, #cce3de 0%, #84a98c 100%);
+    /* 原本是淺到深，現在顏色對調 */
+    background: linear-gradient(135deg, #84a98c 0%, #cce3de 100%);
     box-shadow: 0 4px 10px rgba(132, 169, 140, 0.2);
-    color: #354f52;
+    color: #ffffff; /* 文字改為白色以增加對比 */
   }
+  /* ▲▲▲ 修改結束 ▲▲▲ */
 
   .form-group {
     margin-bottom: 25px;

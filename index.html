@@ -48,7 +48,7 @@
   <p style="text-align:center; color:#666; font-size:0.9rem;">聯合訂購系統</p>
 
   <div class="form-group">
-    <label>選擇店別 (鮮自然)</label>
+    <label>選擇店別</label>
     <select id="store">
       <option value="" disabled selected>請選擇...</option>
     </select>
@@ -135,10 +135,11 @@
 <div class="overlay" id="loading"><div class="spinner"></div></div>
 
 <script>
-  // ▼▼▼ 已更新為您的新網址 ▼▼▼
+  // 網址維持不變
   const scriptURL = 'https://script.google.com/macros/s/AKfycbxWT5k-8KpvjMsJJfFweNpwMoCt_rXCKeysqQeI9QoUpjoYzJ_LKe1nh-ixG2DcEaHx/exec';
 
-  const stores = ['湖美', '成大', '北安', '安平', '開元', '崇善', '文元', '市府', '後甲', '佳里', '民生', '東橋', '歸仁', '嘉義忠孝', '大同', '安南', '塩行', '裕忠', '善化', '新營', '海佃', '新市', '北門', '九份子', '崇明', '麻豆', '仁德', '大灣', '小北店', '水交社店', '永華店', '南工店', '聿川建設', '品川設計', '代銷'];
+  // 已更新店別清單
+  const stores = ['湖美', '成大', '北安', '安平', '開元', '崇善', '文元', '市府', '後甲', '佳里', '總管處'];
   
   const foods = [
     {category: '雞胸系列', items: [
@@ -298,11 +299,7 @@
       toppingPrice += parseInt(box.value);
     });
     const toppingStr = toppingArr.length > 0 ? toppingArr.join(', ') : '';
-    
-    // 飲料總金額 = 飲料基底 + 加料
     const drinkTotalPrice = drinkBasePrice + toppingPrice;
-    
-    // 總金額
     const totalFinal = foodPrice + drinkTotalPrice;
 
     // 驗證
@@ -321,14 +318,14 @@
     formData.append('store', store);
     formData.append('name', username);
     formData.append('food', foodName);
-    formData.append('food_price', foodPrice);          // 傳送餐點金額
+    formData.append('food_price', foodPrice);          
     formData.append('sauce', sauce);
     formData.append('drink', drinkName);
-    formData.append('drink_price', drinkTotalPrice);   // 傳送飲料總金額(含加料)
+    formData.append('drink_price', drinkTotalPrice);   
     formData.append('toppings', toppingStr);
     formData.append('sugar', sugar);
     formData.append('ice', ice);
-    formData.append('total_price', totalFinal);        // 傳送總金額
+    formData.append('total_price', totalFinal);        
     formData.append('note', note);
 
     fetch(scriptURL, { method: 'POST', body: formData })
